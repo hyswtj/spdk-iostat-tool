@@ -272,7 +272,7 @@ spdk_support.o: spdk_support.c spdk_support.h
 iostat.o: iostat.c iostat.h version.h common.h ioconf.h sysconfig.h rd_stats.h count.h
 
 iostat: iostat.o spdk_support.o librdstats_light.a libsyscom.a
-	$(CC) -o $@ $(CFLAGS) $^ $(LFLAGS) $(SPDK_LIB) $(LDFLAGS)
+	$(CC) -o $@ $(CFLAGS) $^ $(LFLAGS) $(LDFLAGS)
 
 tapestat.o: tapestat.c tapestat.h version.h common.h count.h rd_stats.h
 
