@@ -75,6 +75,9 @@ LFLAGS = @STRIP@
 DFLAGS += -DSA_DIR=\"$(SA_DIR)\" -DSADC_PATH=\"$(SADC_PATH)\"
 DFLAGS += $(DFSENSORS)
 
+# Include SPDK enviroment
+include env.spdk.mk
+
 # Commands
 ifndef MSGFMT
 MSGFMT = @MSGFMT@
@@ -264,9 +267,12 @@ sadf: sadf.o act_sadf.o format_sadf.o sadf_misc.o sa_conv.o rndr_stats.o xml_sta
 
 cJSON.o: cJSON.c cJSON.h
 
+spdk_support.o: spdk_support.c spdk_support.h
+
 iostat.o: iostat.c iostat.h version.h common.h ioconf.h sysconfig.h rd_stats.h count.h
 
-iostat: iostat.o librdstats_light.a libsyscom.a
+iostat: iostat.o spdk_support.o librdstats_light.a libsyscom.a
+	$(CC) -o $@ $(CFLAGS) $^ $(LFLAGS) $(SPDK_LIB) $(LDFLAGS)
 
 tapestat.o: tapestat.c tapestat.h version.h common.h count.h rd_stats.h
 

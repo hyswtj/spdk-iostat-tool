@@ -38,6 +38,7 @@
 #include "ioconf.h"
 #include "rd_stats.h"
 #include "count.h"
+#include "spdk_support.h"
 
 #include <locale.h>	/* For setlocale() */
 #ifdef USE_NLS
@@ -1927,6 +1928,11 @@ int main(int argc, char **argv)
 		salloc_dev_list(argc - 1 + count_csvalues(argc, argv));
 	}
 
+        /* Connect to SPDK RPC server */
+        if (spdk_iostat_client_connect() == 0) {
+                fprintf(stderr, "Could not connect to SPDK RPC server, so skip it\n ");
+        }
+
 	/* Process args... */
 	while (opt < argc) {
 
@@ -2255,6 +2261,9 @@ int main(int argc, char **argv)
 	/* Free structures */
 	io_sys_free();
 	sfree_dev_list();
+
+        /* Close connection to SPDK RPC server */
+        spdk_iostat_client_close();
 
 	return 0;
 }
