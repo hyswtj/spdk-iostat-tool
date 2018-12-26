@@ -1929,7 +1929,7 @@ int main(int argc, char **argv)
 	}
 
         /* Connect to SPDK RPC server */
-        if (spdk_iostat_client_connect() == 0) {
+        if (spdk_iostat_client_connect() != 0) {
                 fprintf(stderr, "Could not connect to SPDK RPC server, so skip it\n ");
         }
 

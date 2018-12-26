@@ -27,6 +27,8 @@ struct spdk_iostat_info {
     unsigned int rq_ticks;
 };
 
+int spdk_iostat_get_bdevs_number(void);
+
 int spdk_iostat_parse_bdev_name(char *bdev_name, int *major_number, int *minor_number);
 
 int spdk_iostat_client_connect(void);
