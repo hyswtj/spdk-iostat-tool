@@ -98,7 +98,7 @@ spdk_iostat_get_bdevs_iostat(struct spdk_iostat_info *io_info)
 	json = cJSON_Parse(resp);
 	size = cJSON_GetArraySize(json);
 
-	/* Skip first item since that's "tick_rate" insead of bdev */
+	/* Skip first item since that's "tick_rate" insead of bdev. */
 	for (i = 1; i < size; i++) {
 		item = cJSON_GetArrayItem(json, i);
 
@@ -107,31 +107,37 @@ spdk_iostat_get_bdevs_iostat(struct spdk_iostat_info *io_info)
 
 		obj_item = cJSON_GetObjectItem(item, "bytes_read");
 		io_info[index].rd_sectors = obj_item->valueint >> 9;
-
-		obj_item = cJSON_GetObjectItem(item, "num_read_ops");
-		io_info[index].rd_ios = obj_item->valueint;
-
 		obj_item = cJSON_GetObjectItem(item, "bytes_written");
 		io_info[index].wr_sectors = obj_item->valueint >> 9;
 
+		obj_item = cJSON_GetObjectItem(item, "num_read_ops");
+		io_info[index].rd_ios = obj_item->valueint;
 		obj_item = cJSON_GetObjectItem(item, "num_write_ops");
 		io_info[index].wr_ios = obj_item->valueint;
 
-		// TODO: more infomation needed
-		io_info[index].dc_sectors = 0;
-		io_info[index].dc_ios = 0;
+		obj_item = cJSON_GetObjectItem(item, "read_latency_ticks");
+		io_info[index].rd_ticks = obj_item->valueint;
+		obj_item = cJSON_GetObjectItem(item, "write_latency_ticks");
+		io_info[index].wr_ticks = obj_item->valueint;
 
+		/* There are always zero bacause SPDK doesn't
+		 * have merge operations in bdev layer.
+		 */
 		io_info[index].rd_merges = 0;
 		io_info[index].wr_merges = 0;
-		io_info[index].dc_merges = 0;
 
-		io_info[index].rd_ticks = 0;
-		io_info[index].wr_ticks = 0;
-		io_info[index].dc_ticks = 0;
-
+		/* TODO:
+		 * They weren't provied by SPDK now. Will update them after
+		 * SPDK provide related information in bdev layer.
+		 **/
 		io_info[index].ios_pgr = 0;
 		io_info[index].tot_ticks = 0;
 		io_info[index].rq_ticks = 0;
+		/* Discard IO */
+		io_info[index].dc_sectors = 0;
+		io_info[index].dc_ios = 0;
+		io_info[index].dc_merges = 0;
+		io_info[index].dc_ticks = 0;
 
 		index++;
 	}
