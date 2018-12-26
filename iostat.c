@@ -303,6 +303,8 @@ int update_dev_list(int *dlist_idx, char *device_name)
  */
 void io_sys_init(void)
 {
+	int spdk_bdevs_number = 0;
+
 	/* Allocate and init stat common counters */
 	init_stats();
 
@@ -336,6 +338,9 @@ void io_sys_init(void)
 
 	/* Also allocate stat structures for "group" devices */
 	iodev_nr += group_nr;
+
+	spdk_bdevs_number = spdk_iostat_get_bdevs_number();
+	iodev_nr += spdk_bdevs_number;
 
 	/*
 	 * Allocate structures for number of disks found, but also
@@ -690,6 +695,56 @@ void read_sysfs_stat(int curr)
 	free_unregistered_entries(iodev_nr, st_hdr_iodev);
 }
 
+static void spdk_read_diskstats_stat(int curr)
+{
+	int i;
+	int rc;
+	struct io_stats sdev;
+	char *dm_name;
+	char *ioc_dname;
+	char dev_name[MAX_NAME_LEN];
+	int major, minor;
+	struct spdk_iostat_info io_info[MAX_BDEV_NUM];
+
+	rc = spdk_iostat_get_bdevs_iostat(io_info);
+	for (i = 0; i < rc; i++) {
+		strcpy(dev_name, io_info[i].bdev_name);
+		spdk_iostat_parse_bdev_name(dev_name, &major, &minor);
+		sdev.rd_ios     = io_info[i].rd_ios;
+		sdev.rd_merges  = io_info[i].rd_merges;
+		sdev.rd_sectors = io_info[i].rd_sectors;
+		sdev.rd_ticks   = io_info[i].rd_ticks;
+		sdev.wr_ios     = io_info[i].wr_ios;
+		sdev.wr_merges  = io_info[i].wr_merges;
+		sdev.wr_sectors = io_info[i].wr_sectors;
+		sdev.wr_ticks   = io_info[i].wr_ticks;
+		sdev.ios_pgr    = io_info[i].ios_pgr;
+		sdev.tot_ticks  = io_info[i].tot_ticks;
+		sdev.rq_ticks   = io_info[i].rq_ticks;
+		/* Discard I/O */
+		sdev.dc_ios     = io_info[i].dc_ios;
+		sdev.dc_merges  = io_info[i].dc_merges;
+		sdev.dc_sectors = io_info[i].dc_sectors;
+		sdev.dc_ticks   = io_info[i].dc_ticks;
+
+		if ((ioc_dname = ioc_name(major, minor)) != NULL) {
+			if (strcmp(dev_name, ioc_dname) && strcmp(ioc_dname, K_NODEV)) {
+				strncpy(dev_name, ioc_dname, MAX_NAME_LEN - 1);
+				dev_name[MAX_NAME_LEN - 1] = '\0';
+			}
+		}
+
+		if ((DISPLAY_DEVMAP_NAME(flags)) && (major == dm_major)) {
+			dm_name = transform_devmapname(major, minor);
+			if (dm_name) {
+				strncpy(dev_name, dm_name, MAX_NAME_LEN - 1);
+				dev_name[MAX_NAME_LEN - 1] = '\0';
+			}
+		}
+		save_stats(dev_name, curr, &sdev, iodev_nr, st_hdr_iodev);
+	}
+}
+
 /*
  ***************************************************************************
  * Read stats from /proc/diskstats.
@@ -796,6 +851,8 @@ void read_diskstats_stat(int curr)
 		save_stats(dev_name, curr, &sdev, iodev_nr, st_hdr_iodev);
 	}
 	fclose(fp);
+
+	spdk_read_diskstats_stat(curr);
 
 	/* Free structures corresponding to unregistered devices */
 	free_unregistered_entries(iodev_nr, st_hdr_iodev);
