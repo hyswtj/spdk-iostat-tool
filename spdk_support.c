@@ -25,21 +25,21 @@ static const char *g_rpcsock_addr = SPDK_DEFAULT_RPC_ADDR;
 static int g_addr_family = AF_UNIX;
 
 int
-spdk_iostat_parse_bdev_name(char *bdev_name, int *major, int *minor)
+spdk_iostat_parse_bdev_name(char *bdev_name, int *major_number, int *minor_number)
 {
     if (bdev_name == NULL) {
         return 0;
     }
 
     if (strncmp("Nvme", bdev_name, 4) == 0) {
-        *major = SPDK_IOSTAT_BDEV_NVME;
-        *minor = bdev_name[4] - '0';
+        *major_number = SPDK_IOSTAT_BDEV_NVME;
+        *minor_number = bdev_name[4] - '0';
     } else if (strncmp("Malloc", bdev_name, 6) == 0) {
-        *major = SPDK_IOSTAT_BDEV_MALLOC;
-        *minor = bdev_name[6] - '0';
+        *major_number = SPDK_IOSTAT_BDEV_MALLOC;
+        *minor_number = bdev_name[6] - '0';
     } else if (strncmp("AIO", bdev_name, 3) == 0) {
-        *major = SPDK_IOSTAT_BDEV_AIO;
-        *minor = bdev_name[3] - '0';
+        *major_number = SPDK_IOSTAT_BDEV_AIO;
+        *minor_number = bdev_name[3] - '0';
     } else {
         return 0;
     }
