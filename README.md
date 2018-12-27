@@ -38,11 +38,12 @@ $ sudo make install
 
 After starting your SPDK application successfully, please use SPDK RPC tool to enable bdev sampling for all bdevs you have.
 
-For example, you have two bdevs, Malloc0 and Nvme0n1:
+For example, if you have two bdevs, Malloc0 and Nvme0n1, you could use the following commands:
 
+```
 /path/to/spdk/scripts/rpc.pt set_bdev_qd_sampling_period Malloc0 1
 /path/to/spdk/scripts/rpc.pt set_bdev_qd_sampling_period Nvme0n1 1
-
+```
 Then you can use iostat to check device state as usual. 
 
 Note: the name of devices are the same as that specidied in SPDK configuration file. e.g., Nvme0n1, Malloc0
