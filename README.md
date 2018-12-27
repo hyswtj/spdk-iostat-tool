@@ -41,8 +41,8 @@ After starting your SPDK application successfully, please use SPDK RPC tool to e
 For example, if you have two bdevs, Malloc0 and Nvme0n1, you could use the following commands:
 
 ```
-/path/to/spdk/scripts/rpc.pt set_bdev_qd_sampling_period Malloc0 1
-/path/to/spdk/scripts/rpc.pt set_bdev_qd_sampling_period Nvme0n1 1
+/path/to/spdk/scripts/rpc.py set_bdev_qd_sampling_period Malloc0 1
+/path/to/spdk/scripts/rpc.py set_bdev_qd_sampling_period Nvme0n1 1
 ```
 Then you can use iostat to check device state as usual. 
 
