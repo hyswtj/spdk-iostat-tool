@@ -101,7 +101,6 @@ spdk_iostat_get_bdevs_iostat(struct spdk_iostat_info *io_info)
 	/* Skip first item since that's "tick_rate" insead of bdev. */
 	for (i = 1; i < size; i++) {
 		item = cJSON_GetArrayItem(json, i);
-
 		obj_item = cJSON_GetObjectItem(item, "name");
 		strcpy(io_info[index].bdev_name, obj_item->valuestring);
 
@@ -141,13 +140,9 @@ spdk_iostat_get_bdevs_iostat(struct spdk_iostat_info *io_info)
 
 		index++;
 	}
-
-	if (size > 0) {
-		size--;
-	}
 	free(resp);
 	cJSON_Delete(json);
-	return size;
+	return index;
 }
 
 int
