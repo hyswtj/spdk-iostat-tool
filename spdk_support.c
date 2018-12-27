@@ -126,14 +126,14 @@ spdk_iostat_get_bdevs_iostat(struct spdk_iostat_info *io_info)
 		io_info[index].rd_merges = 0;
 		io_info[index].wr_merges = 0;
 
-		/* TODO:
-		 * They weren't provied by SPDK now. Will update them after
-		 * SPDK provide related information in bdev layer.
-		 **/
-		io_info[index].ios_pgr = 0;
-		io_info[index].tot_ticks = 0;
-		io_info[index].rq_ticks = 0;
-		/* Discard IO */
+		obj_item = cJSON_GetObjectItem(item, "queue_depth");
+		io_info[index].ios_pgr = obj_item->valueint;
+		obj_item = cJSON_GetObjectItem(item, "io_time");
+		io_info[index].tot_ticks = obj_item->valueint;
+		obj_item = cJSON_GetObjectItem(item, "weighted_io_time");
+		io_info[index].rq_ticks = obj_item->valueint;
+
+		/* Discard IO that aren't supported by SPDK in bdev layer */
 		io_info[index].dc_sectors = 0;
 		io_info[index].dc_ios = 0;
 		io_info[index].dc_merges = 0;

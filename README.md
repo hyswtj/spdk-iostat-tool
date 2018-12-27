@@ -36,25 +36,20 @@ $ sudo make install
 ```
 ### Use Guide
 
-After starting your SPDK application successfully, you can use iostat to check the state of devices. 
+After starting your SPDK application successfully, please use SPDK RPC tool to enable bdev sampling for all bdevs you have.
 
-For example:
+For example, you have two bdevs, Malloc0 and Nvme0n1:
 
-```
-#Check read/write state of devices.
-iostat
+/path/to/spdk/scripts/rpc.pt set_bdev_qd_sampling_period Malloc0 1
+/path/to/spdk/scripts/rpc.pt set_bdev_qd_sampling_period Nvme0n1 1
 
-#Check IOPS and throughout of devices.
-iostat -mtx 1
+Then you can use iostat to check device state as usual. 
 
-#Check state of the specified SPDK managed device.
-iostat -d Nvme0n1
-```
 Note: the name of devices are the same as that specidied in SPDK configuration file. e.g., Nvme0n1, Malloc0
 
 ### Note
 
-Now, this is just a initialized version, more works need to be done. At present, the iostat can just be used to monitor the IOPS and throughput of the SPDK managed devices on bdev layer.
+Now, this is just a initialized version, more works need to be done.
 
 To run the newly build sysstat, either explicitly run as ./iostat or add it in to $PATH to avoid invoke already installed version.
 
