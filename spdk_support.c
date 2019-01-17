@@ -103,41 +103,36 @@ spdk_iostat_get_bdevs_iostat(struct spdk_iostat_info *io_info)
 		item = cJSON_GetArrayItem(json, i);
 		obj_item = cJSON_GetObjectItem(item, "name");
 		strcpy(io_info[index].bdev_name, obj_item->valuestring);
-
 		obj_item = cJSON_GetObjectItem(item, "bytes_read");
 		io_info[index].rd_sectors = obj_item->valueint >> 9;
 		obj_item = cJSON_GetObjectItem(item, "bytes_written");
 		io_info[index].wr_sectors = obj_item->valueint >> 9;
-
+		obj_item = cJSON_GetObjectItem(item, "bytes_unmapped");
+		io_info[index].dc_sectors = obj_item->valueint >> 9;
 		obj_item = cJSON_GetObjectItem(item, "num_read_ops");
 		io_info[index].rd_ios = obj_item->valueint;
 		obj_item = cJSON_GetObjectItem(item, "num_write_ops");
 		io_info[index].wr_ios = obj_item->valueint;
-
+		obj_item = cJSON_GetObjectItem(item, "num_unmap_ops");
+		io_info[index].dc_ios = obj_item->valueint;
 		obj_item = cJSON_GetObjectItem(item, "read_latency_ticks");
 		io_info[index].rd_ticks = obj_item->valueint;
 		obj_item = cJSON_GetObjectItem(item, "write_latency_ticks");
 		io_info[index].wr_ticks = obj_item->valueint;
-
-		/* There are always zero bacause SPDK doesn't
-		 * have merge operations in bdev layer.
-		 */
-		io_info[index].rd_merges = 0;
-		io_info[index].wr_merges = 0;
-
+		obj_item = cJSON_GetObjectItem(item, "unmap_latency_ticks");
+		io_info[index].dc_ticks = obj_item->valueint;
 		obj_item = cJSON_GetObjectItem(item, "queue_depth");
 		io_info[index].ios_pgr = obj_item->valueint;
 		obj_item = cJSON_GetObjectItem(item, "io_time");
 		io_info[index].tot_ticks = obj_item->valueint;
 		obj_item = cJSON_GetObjectItem(item, "weighted_io_time");
 		io_info[index].rq_ticks = obj_item->valueint;
-
-		/* Discard IO that aren't supported by SPDK in bdev layer */
-		io_info[index].dc_sectors = 0;
-		io_info[index].dc_ios = 0;
+		/* There are always zero bacause SPDK doesn't
+		 * have merge operations in bdev layer.
+		 */
+		io_info[index].rd_merges = 0;
+		io_info[index].wr_merges = 0;
 		io_info[index].dc_merges = 0;
-		io_info[index].dc_ticks = 0;
-
 		index++;
 	}
 	free(resp);
